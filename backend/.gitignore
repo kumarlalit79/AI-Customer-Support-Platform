@@ -67,3 +67,5 @@ alembic/*.log
 *.swo
 .DS_Store
 Thumbs.db
+
+uploads

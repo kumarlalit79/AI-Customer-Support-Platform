@@ -18,6 +18,7 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 # 'backend' folder ke andar khade hain, isliye direct 'app' se shuru hoga.
 from app.core.database import Base
 from app.models.user import User
+from app.models.document import Document
 
 # ================= 3. ALEMBIC CONFIGURATION =================
 # context.config ko instantiate karne ke baad hi options set kar sakte hain.
