@@ -4,6 +4,9 @@ import uuid
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
 from app.models.document import Document
+from app.ai.loaders.pdf_loader import PDFLoader
+from app.ai.splitters.text_splitter import TextSplitter
+from app.ai.vectorstores.qdrant_client import QdrantManager
 
 UPLOAD_DIRECTORY = "app/uploads"
 
@@ -34,6 +37,16 @@ class DocumentService:
         )
         
         db.add(document)
+        db.commit()
+        db.refresh(document)
+        documents = PDFLoader.load(storage_path)
+        chunks = TextSplitter.split(documents)
+        vectorstore = QdrantManager.get_vectorstore()
+        for chunk in chunks:
+            chunk.metadata["document_id"] = document.id
+            chunk.metadata["filename"] = document.original_filename
+        vectorstore.add_documents(chunks)
+        document.status = "COMPLETED"
         db.commit()
         db.refresh(document)
         return document
