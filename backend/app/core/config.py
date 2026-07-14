@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = ""
     OPENAI_BASE_URL: str = ""
+    OPENAI_EMBEDDING_MODEL: str = ""
 
     LANGCHAIN_API_KEY: str = ""
     LANGCHAIN_PROJECT: str = ""
@@ -22,6 +23,10 @@ class Settings(BaseSettings):
     LANGSMITH_API_KEY: str = ""
     LANGSMITH_PROJECT: str = ""
     LANGSMITH_TRACING: bool = False
+    
+    QDRANT_URL: str = ""
+    QDRANT_API_KEY: str = ""  
+    QDRANT_COLLECTION: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
