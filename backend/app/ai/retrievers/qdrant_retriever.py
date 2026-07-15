@@ -12,3 +12,14 @@ class QdrantRetriever:
             }
         )
         return retriever
+    
+    @staticmethod
+    def retrieve_with_scores(
+        question: str,
+        k: int = 5,
+    ):
+        vectorstore = QdrantManager.get_vectorstore()
+        return vectorstore.similarity_search_with_score(
+            question,
+            k=k,
+        )

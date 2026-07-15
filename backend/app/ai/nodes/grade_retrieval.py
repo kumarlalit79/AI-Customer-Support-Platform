@@ -2,16 +2,12 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
 from app.ai.prompts.retrieval_grader_prompt import RETRIEVAL_GRADER_PROMPT
 from app.core.config import settings
+from app.ai.llms.chat_model import ChatModel
 
 class GradeRetrievalNode:
     @staticmethod
     def execute(state):
-        llm = ChatOpenAI(
-            model=settings.OPENAI_MODEL,
-            api_key=settings.OPENAI_API_KEY,
-            base_url=settings.OPENAI_BASE_URL,
-            temperature=0
-        )
+        llm = ChatModel.get_llm()
         
         chain = (RETRIEVAL_GRADER_PROMPT | llm | StrOutputParser())
         context = "\n\n".join(doc.page_content for doc in state["context"])
