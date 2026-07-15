@@ -18,42 +18,57 @@ def chat(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
     ):
-    conversation = ChatService.get_or_create_conversation(
-        db=db,
-        conversation_id=request.conversation_id,
-        user_id=current_user.id
-    )
-    
-    history = ChatService.get_conversation_messages(db, conversation.id)
-    chat_history = []
-    for message in history:
-        chat_history.append(f"{message.role}: {message.content}")
-    
-    ChatService.save_message(
-        db=db,
-        conversation_id=conversation.id,
-        role="user",
-        content=request.question
-    )
+    try:
+        
+        conversation = ChatService.get_or_create_conversation(
+            db=db,
+            conversation_id=request.conversation_id,
+            user_id=current_user.id
+        )
+        
+        history = ChatService.get_conversation_messages(db, conversation.id)
+        chat_history = [
+            f"{message.role}: {message.content}"
+            for message in history
+        ]
+        
+        ChatService.save_message(
+            db=db,
+            conversation_id=conversation.id,
+            role="user",
+            content=request.question
+        )
 
-    result = graph.invoke(
-        {
-            "question": request.question,
-            "rewrite_count": 0,
-            "generation_count": 0,
-            "chat_history": chat_history,
-            "messages": [],
-        }
-    )
-    ChatService.save_message(
-        db=db,
-        conversation_id=conversation.id,
-        role="assistant",
-        content=result["answer"]
-    )
-    return ChatResponse(
-        conversation_id=conversation.id,
-        answer=result["answer"],
-        confidence=result["confidence"],
-        sources=result["sources"]
-    )
+        result = graph.invoke(
+            {
+                "question": request.question,
+                "rewrite_count": 0,
+                "generation_count": 0,
+                "chat_history": chat_history,
+                "messages": [],
+            }
+        )
+        ChatService.save_message(
+            db=db,
+            conversation_id=conversation.id,
+            role="assistant",
+            content=result["answer"]
+        )
+        return ChatResponse(
+            success=True,
+            conversation_id=conversation.id,
+            answer=result["answer"],
+            confidence=result["confidence"],
+            sources=result["sources"],
+            error=None
+        )
+    except Exception as e:
+        return ChatResponse(
+            success=False,
+            conversation_id=0,
+            answer="",
+            confidence=0,
+            sources=[],
+            error=str(e),
+        )
+        
