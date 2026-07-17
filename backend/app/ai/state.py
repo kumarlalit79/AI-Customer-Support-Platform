@@ -12,5 +12,4 @@ class AgentState(TypedDict):
     rewrite_count: int
     generation_count: int
     chat_history: list[str]
-    retrieval_scores: list[float]
     messages: Annotated[list, add_messages]

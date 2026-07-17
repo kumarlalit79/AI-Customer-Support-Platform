@@ -23,3 +23,5 @@ class QdrantRetriever:
             question,
             k=k,
         )
+        
+    

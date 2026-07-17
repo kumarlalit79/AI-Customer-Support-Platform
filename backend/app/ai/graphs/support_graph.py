@@ -35,7 +35,10 @@ builder.add_node("rewrite_query", RewriteQueryNode.execute)
 builder.add_node("generate", GenerateNode.execute)
 builder.add_node("grade_generation", GradeGenerationNode.execute)
 
-builder.add_edge(START, "retrieve")
+builder.add_edge(
+    START,
+    "retrieve",
+)
 
 builder.add_edge(
     "retrieve",
@@ -70,6 +73,5 @@ builder.add_conditional_edges(
         END: END,
     },
 )
-
 
 graph = builder.compile()
