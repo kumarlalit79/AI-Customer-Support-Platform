@@ -167,11 +167,11 @@ def upload_markdown(
 
     )
     
-    @router.post(
+@router.post(
     "/upload/faq",
     response_model=DocumentResponse,
     )
-    def upload_faq(
+def upload_faq(
 
         request: FAQUploadRequest,
 
@@ -191,11 +191,11 @@ def upload_markdown(
 
         )
         
-    @router.get(
+@router.get(
     "/statistics",
     response_model=KnowledgeStatisticsResponse,
 )
-    def knowledge_statistics(
+def knowledge_statistics(
 
         db: Session = Depends(get_db),
 
