@@ -121,8 +121,11 @@ export const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
     })
   }
 
-  // Simulate file upload progress during mutation
+  // Simulate file upload progress during mutation — only runs while uploads are in-flight
   useEffect(() => {
+    const hasActiveUploads = activeUploads.some((up) => up.status === 'uploading')
+    if (!hasActiveUploads) return
+
     const interval = setInterval(() => {
       setActiveUploads((prev) =>
         prev.map((up) => {
@@ -135,7 +138,7 @@ export const UploadSection = ({ onUploadSuccess }: UploadSectionProps) => {
     }, 400)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [activeUploads])
 
   // FAQ form management
   const addFaqItem = () => {

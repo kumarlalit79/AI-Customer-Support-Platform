@@ -49,7 +49,13 @@ export const DocumentRow = ({
         </span>
       </TableCell>
       <TableCell className="text-zinc-500 dark:text-zinc-400 text-xs">
-        Recently
+        {document.created_at
+          ? new Date(document.created_at).toLocaleDateString([], {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })
+          : '—'}
       </TableCell>
       <TableCell>
         {document.status === 'PROCESSING' && (

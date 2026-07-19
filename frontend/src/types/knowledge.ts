@@ -3,6 +3,7 @@ export interface Document {
   filename: string
   original_filename: string
   status: 'PROCESSING' | 'READY' | 'FAILED' | string
+  created_at?: string
 }
 
 export interface KnowledgeStatistics {
