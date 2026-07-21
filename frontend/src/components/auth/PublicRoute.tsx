@@ -1,9 +1,9 @@
-import { Navigate, Outlet, useLocation } from 'react-router'
+import { Navigate, Outlet } from 'react-router'
 import { useAuthStore } from '../../store/auth'
+import { getRoleHomePath } from '../../lib/roleRoutes'
 
 export const PublicRoute = () => {
-  const { isAuthenticated, isLoading } = useAuthStore()
-  const location = useLocation()
+  const { user, isAuthenticated, isLoading } = useAuthStore()
 
   if (isLoading) {
     return (
@@ -17,10 +17,7 @@ export const PublicRoute = () => {
   }
 
   if (isAuthenticated) {
-    // If user is already authenticated, redirect to the page they were trying to visit, or dashboard
-    const from =
-      (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/dashboard'
-    return <Navigate to={from} replace />
+    return <Navigate to={getRoleHomePath(user?.role)} replace />
   }
 
   return <Outlet />

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Link, useLocation } from 'react-router'
+import { useNavigate, Link } from 'react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -8,6 +8,7 @@ import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import { authService } from '../../../services/auth'
 import type { LoginPayload } from '../../../services/auth'
 import { useAuthStore } from '../../../store/auth'
+import { getRoleHomePath } from '../../../lib/roleRoutes'
 import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
 import { Label } from '../../../components/ui/label'
@@ -29,7 +30,6 @@ type ApiError = {
 
 const LoginPage = () => {
   const navigate = useNavigate()
-  const location = useLocation()
   const { login: setAuthData } = useAuthStore()
   const [showPassword, setShowPassword] = useState(false)
   const [backendError, setBackendError] = useState<string | null>(null)
@@ -61,9 +61,7 @@ const LoginPage = () => {
     },
     onSuccess: ({ tokenData, userData }) => {
       setAuthData(tokenData.access_token, userData)
-      const from =
-        (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/dashboard'
-      navigate(from, { replace: true })
+      navigate(getRoleHomePath(userData.role), { replace: true })
     },
     onError: (error: unknown) => {
       // Reset token to prevent half-logged in states

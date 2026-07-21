@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Sparkles } from 'lucide-react'
 
 const STAGES = [
-  { label: 'Searching knowledge base...', duration: 1200 },
+  { label: 'Searching sources...', duration: 1200 },
   { label: 'Thinking...', duration: 1400 },
   { label: 'Generating response...', duration: Infinity },
 ]

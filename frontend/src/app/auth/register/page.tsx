@@ -7,6 +7,7 @@ import { useMutation } from '@tanstack/react-query'
 import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import { authService } from '../../../services/auth'
 import { useAuthStore } from '../../../store/auth'
+import { getRoleHomePath } from '../../../lib/roleRoutes'
 import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
 import { Label } from '../../../components/ui/label'
@@ -79,7 +80,7 @@ const RegisterPage = () => {
     },
     onSuccess: ({ tokenData, userData }) => {
       setAuthData(tokenData.access_token, userData)
-      navigate('/dashboard', { replace: true })
+      navigate(getRoleHomePath(userData.role), { replace: true })
     },
     onError: (error: unknown) => {
       // Clean up token in case of partial error

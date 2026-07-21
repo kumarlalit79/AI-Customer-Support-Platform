@@ -1,8 +1,17 @@
 import { Navigate, Outlet, useLocation } from 'react-router'
 import { useAuthStore } from '../../store/auth'
+import { getRoleHomePath } from '../../lib/roleRoutes'
 
-export const ProtectedRoute = () => {
-  const { token, isAuthenticated, isLoading } = useAuthStore()
+interface ProtectedRouteProps {
+  allowedRoles?: string[]
+}
+
+const isRouteSection = (pathname: string, section: string) => (
+  pathname === section || pathname.startsWith(`${section}/`)
+)
+
+export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
+  const { token, user, isAuthenticated, isLoading } = useAuthStore()
   const location = useLocation()
 
   if (isLoading) {
@@ -19,6 +28,18 @@ export const ProtectedRoute = () => {
   if (!token || !isAuthenticated) {
     // Redirect to login page and store the attempted path
     return <Navigate to="/login" state={{ from: location }} replace />
+  }
+
+  if (user?.role === 'customer' && isRouteSection(location.pathname, '/dashboard')) {
+    return <Navigate to="/support" replace />
+  }
+
+  if (user?.role === 'admin' && isRouteSection(location.pathname, '/support')) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user?.role || '')) {
+    return <Navigate to={getRoleHomePath(user?.role)} replace />
   }
 
   return <Outlet />

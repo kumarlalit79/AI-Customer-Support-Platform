@@ -23,6 +23,8 @@ import {
   deleteConversation,
 } from '../../../services/conversations'
 import { useChatStore } from '../../../store/chat'
+import { useAuthStore } from '../../../store/auth'
+import { getRoleHomePath } from '../../../lib/roleRoutes'
 import type { Conversation } from '../../../types/chat'
 
 function formatDate(iso: string): string {
@@ -108,6 +110,7 @@ export default function ConversationsPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { setActiveConversationId } = useChatStore()
+  const { user } = useAuthStore()
   const [search, setSearch] = useState('')
   const [renameTarget, setRenameTarget] = useState<Conversation | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Conversation | null>(null)
@@ -188,7 +191,7 @@ export default function ConversationsPage() {
   // ─── Handlers ─────────────────────────────────────────────────────────────────
   const handleContinue = (id: number) => {
     setActiveConversationId(id)
-    navigate('/dashboard/chat')
+    navigate(user?.role === 'customer' ? '/support' : '/dashboard/chat')
   }
 
   return (
@@ -256,7 +259,7 @@ export default function ConversationsPage() {
           action={
             !search ? (
               <Button
-                onClick={() => navigate('/dashboard/chat')}
+                onClick={() => navigate(getRoleHomePath(user?.role))}
                 className="gap-2 cursor-pointer"
               >
                 <MessageSquare className="w-4 h-4" />
