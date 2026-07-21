@@ -48,6 +48,13 @@ def chat(
                 "messages": [],
             }
         )
+        if not result.get("answer"):
+            result["answer"] = (
+                "I couldn't find relevant information in the knowledge base."
+            )
+
+        if not result.get("sources"):
+            result["confidence"] = 0.0
         ChatService.save_message(
             db=db,
             conversation_id=conversation.id,
