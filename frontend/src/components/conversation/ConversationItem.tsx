@@ -61,8 +61,8 @@ export function ConversationItem({ conversation, isActive, onClick }: Conversati
       <div
         className={`group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-150 ${
           isActive
-            ? 'bg-purple-600/20 border border-purple-500/30 text-zinc-100'
-            : 'hover:bg-zinc-800/60 border border-transparent text-zinc-400 hover:text-zinc-200'
+            ? 'bg-purple-100 dark:bg-purple-600/20 border border-purple-200 dark:border-purple-500/30 text-purple-900 dark:text-zinc-100'
+            : 'hover:bg-zinc-100 dark:hover:bg-zinc-800/60 border border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
         }`}
         onClick={onClick}
       >
@@ -70,8 +70,8 @@ export function ConversationItem({ conversation, isActive, onClick }: Conversati
         <div
           className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
             isActive
-              ? 'bg-purple-600/40 text-purple-300'
-              : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-400'
+              ? 'bg-purple-200 dark:bg-purple-600/40 text-purple-700 dark:text-purple-300'
+              : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-400'
           }`}
         >
           <MessageSquare className="w-3.5 h-3.5" />
@@ -87,8 +87,8 @@ export function ConversationItem({ conversation, isActive, onClick }: Conversati
         <button
           className={`p-1 rounded-lg transition-all duration-150 cursor-pointer shrink-0 ${
             menuOpen
-              ? 'opacity-100 bg-zinc-700 text-zinc-300'
-              : 'opacity-0 group-hover:opacity-100 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-300'
+              ? 'opacity-100 bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-300'
+              : 'opacity-0 group-hover:opacity-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-300'
           }`}
           onClick={(e) => {
             e.stopPropagation()
@@ -110,9 +110,9 @@ export function ConversationItem({ conversation, isActive, onClick }: Conversati
                 setMenuOpen(false)
               }}
             />
-            <div className="absolute right-0 top-8 z-50 w-40 rounded-xl bg-zinc-800 border border-zinc-700/60 shadow-xl overflow-hidden py-1">
+            <div className="absolute right-0 top-8 z-50 w-40 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700/60 shadow-xl overflow-hidden py-1">
               <button
-                className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-700/60 hover:text-zinc-100 transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700/60 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation()
                   setMenuOpen(false)
@@ -123,7 +123,7 @@ export function ConversationItem({ conversation, isActive, onClick }: Conversati
                 Rename
               </button>
               <button
-                className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation()
                   setMenuOpen(false)

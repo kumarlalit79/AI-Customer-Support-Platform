@@ -15,15 +15,16 @@ export function SourceCard({ sources }: SourceCardProps) {
       </p>
       <div className="flex flex-wrap gap-2">
         {sources.map((src, idx) => (
-          <span
+          <a
             key={idx}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200/70 dark:border-zinc-700/70"
+            href="#"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200/70 dark:border-zinc-700/70 hover:bg-white dark:hover:bg-zinc-700 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
           >
             <FileText className="w-3 h-3 shrink-0 text-purple-500" />
             {src.filename}
             <span className="text-zinc-400 dark:text-zinc-500">•</span>
             <span className="text-zinc-400 dark:text-zinc-500">Page {src.page}</span>
-          </span>
+          </a>
         ))}
       </div>
     </div>

@@ -28,21 +28,21 @@ export function TypingLoader() {
       {/* Bubble */}
       <div className="flex items-center gap-3 px-4 py-3 rounded-2xl rounded-tl-sm bg-white dark:bg-zinc-800/80 border border-zinc-200/60 dark:border-zinc-700/60 shadow-sm max-w-xs">
         {/* Dots */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <span
-            className="w-2 h-2 rounded-full bg-purple-500 animate-bounce"
-            style={{ animationDelay: '0ms', animationDuration: '1s' }}
+            className="w-1.5 h-1.5 rounded-full bg-purple-500/80 animate-pulse"
+            style={{ animationDelay: '0ms', animationDuration: '1.2s' }}
           />
           <span
-            className="w-2 h-2 rounded-full bg-purple-400 animate-bounce"
-            style={{ animationDelay: '150ms', animationDuration: '1s' }}
+            className="w-1.5 h-1.5 rounded-full bg-purple-500/80 animate-pulse"
+            style={{ animationDelay: '200ms', animationDuration: '1.2s' }}
           />
           <span
-            className="w-2 h-2 rounded-full bg-purple-300 animate-bounce"
-            style={{ animationDelay: '300ms', animationDuration: '1s' }}
+            className="w-1.5 h-1.5 rounded-full bg-purple-500/80 animate-pulse"
+            style={{ animationDelay: '400ms', animationDuration: '1.2s' }}
           />
         </div>
-        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium transition-all duration-300">
+        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium transition-opacity duration-300">
           {STAGES[stageIndex].label}
         </span>
       </div>

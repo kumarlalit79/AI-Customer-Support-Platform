@@ -60,9 +60,9 @@ export function ConversationSidebar({ onNewChat }: ConversationSidebarProps) {
   }, [filtered])
 
   return (
-    <div className="flex flex-col h-full bg-zinc-900 border-r border-zinc-800 w-64 shrink-0 select-none">
+    <div className="flex flex-col h-full bg-zinc-50 dark:bg-zinc-900 border-r border-zinc-200/60 dark:border-zinc-800 w-64 shrink-0 select-none">
       {/* Header */}
-      <div className="px-4 pt-4 pb-3 border-b border-zinc-800">
+      <div className="px-4 pt-4 pb-3 border-b border-zinc-200/60 dark:border-zinc-800">
         <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3">
           Conversations
         </h2>

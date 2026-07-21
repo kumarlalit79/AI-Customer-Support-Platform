@@ -51,10 +51,10 @@ export function ConversationListSkeleton() {
           key={i}
           className="px-3 py-3 rounded-xl flex items-center gap-3"
         >
-          <div className="w-8 h-8 rounded-lg bg-zinc-700/50 animate-pulse shrink-0" />
+          <div className="w-8 h-8 rounded-lg bg-zinc-200 dark:bg-zinc-700/50 animate-pulse shrink-0" />
           <div className="flex-1 space-y-1.5">
-            <div className="h-3 rounded-full bg-zinc-700/50 animate-pulse w-3/4" />
-            <div className="h-2.5 rounded-full bg-zinc-700/30 animate-pulse w-1/2" />
+            <div className="h-3 rounded-full bg-zinc-200 dark:bg-zinc-700/50 animate-pulse w-3/4" />
+            <div className="h-2.5 rounded-full bg-zinc-200 dark:bg-zinc-700/30 animate-pulse w-1/2" />
           </div>
         </div>
       ))}

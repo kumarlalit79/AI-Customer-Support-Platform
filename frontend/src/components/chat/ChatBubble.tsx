@@ -49,7 +49,7 @@ export function UserMessage({ message }: UserMessageProps) {
         <span className="text-[10px] text-zinc-500">{formatTime(message.created_at)}</span>
         <button
           onClick={handleCopy}
-          className="p-1 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-700/50 transition-all cursor-pointer"
+          className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 transition-colors cursor-pointer"
           aria-label="Copy message"
         >
           {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -111,7 +111,7 @@ export function AssistantMessage({ message, onRegenerate }: AssistantMessageProp
 
         <button
           onClick={handleCopy}
-          className="p-1 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-700/50 transition-all cursor-pointer"
+          className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 transition-colors cursor-pointer"
           aria-label="Copy message"
         >
           {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -120,7 +120,7 @@ export function AssistantMessage({ message, onRegenerate }: AssistantMessageProp
         {onRegenerate && (
           <button
             onClick={onRegenerate}
-            className="p-1 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-700/50 transition-all cursor-pointer"
+            className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300 hover:bg-zinc-200/50 dark:hover:bg-zinc-700/50 transition-colors cursor-pointer"
             aria-label="Regenerate response"
             title="Regenerate (UI only)"
           >

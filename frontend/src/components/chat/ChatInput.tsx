@@ -52,10 +52,10 @@ export function ChatInput({
     <div className="px-4 py-3 border-t border-zinc-200/60 dark:border-zinc-700/60 bg-zinc-50/80 dark:bg-zinc-900/80 backdrop-blur-sm">
       <div className="max-w-3xl mx-auto">
         <div
-          className={`flex items-end gap-3 px-4 py-3 rounded-2xl border transition-all duration-200 ${
+          className={`flex items-end gap-3 px-4 py-3 rounded-2xl border transition-all duration-300 ease-out ${
             disabled
               ? 'bg-zinc-100 dark:bg-zinc-800/50 border-zinc-200/60 dark:border-zinc-700/60'
-              : 'bg-white dark:bg-zinc-800 border-zinc-200/60 dark:border-zinc-700/60 shadow-sm focus-within:border-purple-400/70 focus-within:shadow-md focus-within:shadow-purple-500/5'
+              : 'bg-white dark:bg-zinc-800 border-zinc-200/60 dark:border-zinc-700/60 shadow-sm focus-within:border-purple-500 dark:focus-within:border-purple-400 focus-within:ring-4 focus-within:ring-purple-500/15 dark:focus-within:ring-purple-400/15 focus-within:shadow-md'
           }`}
         >
           <textarea
@@ -66,7 +66,7 @@ export function ChatInput({
             placeholder={disabled ? 'AI is generating...' : placeholder}
             disabled={disabled}
             rows={1}
-            className="flex-1 resize-none bg-transparent text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 outline-none border-none min-h-[24px] max-h-[180px] leading-relaxed disabled:cursor-not-allowed"
+            className="flex-1 resize-none bg-transparent text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 outline-none border-none min-h-[24px] max-h-[180px] leading-relaxed disabled:cursor-not-allowed focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
           />
 
           {/* Send button */}
