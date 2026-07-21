@@ -90,7 +90,7 @@ class DocumentService:
         document = (
             db.query(Document).filter(Document.id == document_id, Document.uploaded_by == user_id).first()
         )
-        if document in None:
+        if document is None:
             return False
         
         import os
@@ -171,6 +171,8 @@ class DocumentService:
         document = Document(
             filename=filename,
             original_filename=file.filename,
+            content_type=file.content_type,
+            file_size=os.path.getsize(storage_path),
             storage_path=storage_path,
             uploaded_by=user_id,
             status="PROCESSING",
@@ -222,18 +224,12 @@ class DocumentService:
             )
 
         document = Document(
-
             filename=filename,
-
             original_filename=file.filename,
-
             storage_path=storage_path,
-
             uploaded_by=user_id,
-
             status="PROCESSING",
-
-        )
+        )                           
 
         db.add(document)
 
@@ -294,17 +290,13 @@ class DocumentService:
             )
 
         document = Document(
-
             filename=filename,
-
             original_filename=file.filename,
-
+            content_type=file.content_type,
+            file_size=os.path.getsize(storage_path),
             storage_path=storage_path,
-
             uploaded_by=user_id,
-
             status="PROCESSING",
-
         )
 
         db.add(document)
@@ -345,6 +337,8 @@ class DocumentService:
         document = Document(
             filename=request.title,
             original_filename=request.title,
+            content_type="application/json",
+            file_size=0,
             storage_path="FAQ",
             uploaded_by=user_id,
             status="PROCESSING",
