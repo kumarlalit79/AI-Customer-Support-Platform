@@ -22,7 +22,8 @@ class AuthService:
         user = User(
             full_name=user_data.full_name,
             email=user_data.email,
-            hashed_password=hash_password(user_data.password)
+            hashed_password=hash_password(user_data.password),
+            role="customer"
         )
         
         db.add(user)
