@@ -226,6 +226,8 @@ class DocumentService:
         document = Document(
             filename=filename,
             original_filename=file.filename,
+            content_type=file.content_type,
+            file_size=os.path.getsize(storage_path),
             storage_path=storage_path,
             uploaded_by=user_id,
             status="PROCESSING",
@@ -410,10 +412,5 @@ class DocumentService:
                 stats["total_docx"] += 1
 
             elif extension in [".md", ".markdown"]:
-
                 stats["total_markdown"] += 1
-
         return stats
-    
-    
-    

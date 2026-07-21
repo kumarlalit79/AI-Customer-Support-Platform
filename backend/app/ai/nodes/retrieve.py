@@ -6,7 +6,7 @@ class RetrieveNode:
     @staticmethod
     def execute(state):
         results = QdrantRetriever.retrieve_with_scores(
-            [state["question"]]
+            state["question"]
         )
         documents = []
         scores = []

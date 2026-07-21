@@ -18,16 +18,20 @@ class GenerateNode:
             "context": context,
             "chat_history": history
         })
-        unique_sources = []
+        unique_sources = {}
+
         for doc in state["context"]:
             filename = doc.metadata.get("filename", "")
             page = doc.metadata.get("page", 0)
+
             key = (filename, page)
+
             if key not in unique_sources:
                 unique_sources[key] = {
                     "filename": filename,
                     "page": page,
                 }
+
         sources = list(unique_sources.values())
 
         return {

@@ -11,6 +11,10 @@ class GradeRetrievalNode:
         
         chain = (RETRIEVAL_GRADER_PROMPT | llm | StrOutputParser())
         context = "\n\n".join(doc.page_content for doc in state["context"])
+        if not state["context"]:
+            return {
+                "retrieval_ok": "no"
+            }
         result = chain.invoke(
             {
                 "question": state["question"],

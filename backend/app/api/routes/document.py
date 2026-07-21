@@ -26,6 +26,26 @@ def upload_document(
     )
     
 @router.get(
+    "/statistics",
+    response_model=KnowledgeStatisticsResponse,
+)
+def knowledge_statistics(
+
+        db: Session = Depends(get_db),
+
+        current_user: User = Depends(get_current_user),
+
+    ):
+
+        return DocumentService.knowledge_statistics(
+
+            db=db,
+
+            user_id=current_user.id,
+
+        )
+    
+@router.get(
     "",
     response_model=list[DocumentResponse],
 )
@@ -55,6 +75,8 @@ def get_document(
         document_id,
         current_user.id,
     )
+
+
 
 
 @router.delete(
@@ -191,24 +213,6 @@ def upload_faq(
 
         )
         
-@router.get(
-    "/statistics",
-    response_model=KnowledgeStatisticsResponse,
-)
-def knowledge_statistics(
 
-        db: Session = Depends(get_db),
-
-        current_user: User = Depends(get_current_user),
-
-    ):
-
-        return DocumentService.knowledge_statistics(
-
-            db=db,
-
-            user_id=current_user.id,
-
-        )
         
         
