@@ -30,7 +30,7 @@ export const DashboardLayout = () => {
 
   const handleLogout = () => {
     logout()
-    navigate('/auth/login', { replace: true })
+    navigate('/login', { replace: true })
   }
 
   const toggleMobileMenu = () => {

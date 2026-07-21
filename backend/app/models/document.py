@@ -14,7 +14,7 @@ class Document(Base):
     status = Column(
         String(50),
         nullable=False,
-        default="PROCESSING"
+        default="UPLOADED"
     )
     uploaded_by=Column(Integer, ForeignKey("users.id"))
     created_at=Column(DateTime(timezone=True), server_default=func.now())

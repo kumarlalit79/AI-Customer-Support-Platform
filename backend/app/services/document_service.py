@@ -5,7 +5,6 @@ from fastapi import UploadFile
 from sqlalchemy.orm import Session
 from app.models.document import Document
 from app.ai.loaders.pdf_loader import PDFLoader
-from app.ai.splitters.text_splitter import TextSplitter
 from app.ai.vectorstores.qdrant_client import QdrantManager
 from app.services.ingestion_service import IngestionService
 from app.ai.loaders.text_loader import TXTLoader
@@ -13,12 +12,90 @@ from app.ai.loaders.docx_loader import DOCXLoader
 from app.ai.loaders.markdown_loader import MarkdownLoader
 from app.ai.loaders.faq_loader import FAQLoader
 from app.schemas.faq import FAQUploadRequest
-import os
-from sqlalchemy import func
 
 UPLOAD_DIRECTORY = "app/uploads"
+STATUS_UPLOADED = "UPLOADED"
+STATUS_PROCESSING = "PROCESSING"
+STATUS_READY = "READY"
+STATUS_FAILED = "FAILED"
 
 class DocumentService:
+    @staticmethod
+    def _set_status(
+        db: Session,
+        document: Document,
+        status: str,
+    ) -> None:
+        document.status = status
+        db.commit()
+        db.refresh(document)
+
+    @staticmethod
+    def _load_and_ingest(
+        loader,
+        storage_path: str,
+        document: Document,
+    ) -> None:
+        pages = loader.load(
+            storage_path
+        )
+        IngestionService.ingest(
+            documents=pages,
+            document_id=document.id,
+            filename=document.original_filename,
+        )
+
+    @staticmethod
+    def _process_document(
+        db: Session,
+        document: Document,
+        loader,
+    ) -> Document:
+        DocumentService._set_status(
+            db,
+            document,
+            STATUS_PROCESSING,
+        )
+        try:
+            DocumentService._load_and_ingest(
+                loader,
+                document.storage_path,
+                document,
+            )
+            DocumentService._set_status(
+                db,
+                document,
+                STATUS_READY,
+            )
+            return document
+        except Exception:
+            DocumentService._set_status(
+                db,
+                document,
+                STATUS_FAILED,
+            )
+            raise
+
+    @staticmethod
+    def _get_file_loader(document: Document):
+        if document.storage_path == "FAQ":
+            raise ValueError("FAQ documents cannot be reindexed because the original FAQ payload is not stored.")
+
+        extension = os.path.splitext(
+            document.original_filename
+        )[1].lower()
+
+        if extension == ".pdf":
+            return PDFLoader
+        if extension == ".txt":
+            return TXTLoader
+        if extension == ".docx":
+            return DOCXLoader
+        if extension in [".md", ".markdown"]:
+            return MarkdownLoader
+
+        raise ValueError(f"Unsupported document type for reindex: {extension}")
+
     @staticmethod
     def upload_document(
         db: Session,
@@ -41,26 +118,17 @@ class DocumentService:
             file_size=os.path.getsize(storage_path),
             storage_path=storage_path,
             uploaded_by=user_id,
-            status="UPLOADED"
+            status=STATUS_UPLOADED
         )
         
         db.add(document)
         db.commit()
         db.refresh(document)
-        pages = PDFLoader.load(
-            storage_path
+        return DocumentService._process_document(
+            db,
+            document,
+            PDFLoader,
         )
-
-        IngestionService.ingest(
-            documents=pages,
-            document_id=document.id,
-            filename=document.original_filename,
-        )
-
-        document.status = "COMPLETED"
-        db.commit()
-        db.refresh(document)
-        return document
     
     @staticmethod
     def get_documents(
@@ -93,8 +161,6 @@ class DocumentService:
         if document is None:
             return False
         
-        import os
-        
         if os.path.exists(
             document.storage_path
         ):
@@ -124,27 +190,33 @@ class DocumentService:
         if document is None:
             return None
         
-        document.status = "PROCESSING"
-        db.commit()
-        
+        DocumentService._set_status(
+            db,
+            document,
+            STATUS_PROCESSING,
+        )
         try:
             QdrantManager.delete_document(document.id)
-            pages = PDFLoader.load(
-                document.storage_path
+            loader = DocumentService._get_file_loader(
+                document
             )
-
-            IngestionService.ingest(
-                documents=pages,
-                document_id=document.id,
-                filename=document.original_filename,
+            DocumentService._load_and_ingest(
+                loader,
+                document.storage_path,
+                document,
             )
-            document.status = "READY"
-            db.commit()
-            db.refresh(document)
+            DocumentService._set_status(
+                db,
+                document,
+                STATUS_READY,
+            )
             return document
         except Exception:
-            document.status = "FAILED"
-            db.commit()
+            DocumentService._set_status(
+                db,
+                document,
+                STATUS_FAILED,
+            )
             raise
         
     @staticmethod
@@ -153,9 +225,7 @@ class DocumentService:
         file: UploadFile,
         user_id: int,
     ):
-        import os
-        import shutil
-        import uuid
+        os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
         extension = os.path.splitext(file.filename)[1]
         filename = f"{uuid.uuid4()}{extension}"
         storage_path = os.path.join(
@@ -175,23 +245,16 @@ class DocumentService:
             file_size=os.path.getsize(storage_path),
             storage_path=storage_path,
             uploaded_by=user_id,
-            status="PROCESSING",
+            status=STATUS_UPLOADED,
         )
         db.add(document)
         db.commit()
         db.refresh(document)
-        pages = TXTLoader.load(
-            storage_path
+        return DocumentService._process_document(
+            db,
+            document,
+            TXTLoader,
         )
-        IngestionService.ingest(
-            documents=pages,
-            document_id=document.id,
-            filename=document.original_filename,
-        )
-        document.status = "READY"
-        db.commit()
-        db.refresh(document)
-        return document
     
     @staticmethod
     def upload_docx(
@@ -199,10 +262,7 @@ class DocumentService:
         file: UploadFile,
         user_id: int,
     ):
-
-        import os
-        import shutil
-        import uuid
+        os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
         extension = os.path.splitext(
             file.filename
@@ -230,7 +290,7 @@ class DocumentService:
             file_size=os.path.getsize(storage_path),
             storage_path=storage_path,
             uploaded_by=user_id,
-            status="PROCESSING",
+            status=STATUS_UPLOADED,
         )                           
 
         db.add(document)
@@ -238,28 +298,11 @@ class DocumentService:
         db.commit()
 
         db.refresh(document)
-
-        pages = DOCXLoader.load(
-            storage_path
+        return DocumentService._process_document(
+            db,
+            document,
+            DOCXLoader,
         )
-
-        IngestionService.ingest(
-
-            documents=pages,
-
-            document_id=document.id,
-
-            filename=document.original_filename,
-
-        )
-
-        document.status = "READY"
-
-        db.commit()
-
-        db.refresh(document)
-
-        return document
     
     @staticmethod
     def upload_markdown(
@@ -267,10 +310,7 @@ class DocumentService:
         file: UploadFile,
         user_id: int,
     ):
-
-        import os
-        import shutil
-        import uuid
+        os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
         extension = os.path.splitext(
             file.filename
@@ -298,7 +338,7 @@ class DocumentService:
             file_size=os.path.getsize(storage_path),
             storage_path=storage_path,
             uploaded_by=user_id,
-            status="PROCESSING",
+            status=STATUS_UPLOADED,
         )
 
         db.add(document)
@@ -306,28 +346,11 @@ class DocumentService:
         db.commit()
 
         db.refresh(document)
-
-        pages = MarkdownLoader.load(
-            storage_path
+        return DocumentService._process_document(
+            db,
+            document,
+            MarkdownLoader,
         )
-
-        IngestionService.ingest(
-
-            documents=pages,
-
-            document_id=document.id,
-
-            filename=document.original_filename,
-
-        )
-
-        document.status = "READY"
-
-        db.commit()
-
-        db.refresh(document)
-
-        return document
     
     @staticmethod
     def upload_faq(
@@ -343,25 +366,39 @@ class DocumentService:
             file_size=0,
             storage_path="FAQ",
             uploaded_by=user_id,
-            status="PROCESSING",
+            status=STATUS_UPLOADED,
         )
 
         db.add(document)
         db.commit()
         db.refresh(document)
-        pages = FAQLoader.load(
-            request
+        DocumentService._set_status(
+            db,
+            document,
+            STATUS_PROCESSING,
         )
-        IngestionService.ingest(
-            documents=pages,
-            document_id=document.id,
-            filename=document.original_filename,
-        )
-
-        document.status = "READY"
-        db.commit()
-        db.refresh(document)
-        return document
+        try:
+            pages = FAQLoader.load(
+                request
+            )
+            IngestionService.ingest(
+                documents=pages,
+                document_id=document.id,
+                filename=document.original_filename,
+            )
+            DocumentService._set_status(
+                db,
+                document,
+                STATUS_READY,
+            )
+            return document
+        except Exception:
+            DocumentService._set_status(
+                db,
+                document,
+                STATUS_FAILED,
+            )
+            raise
     
     @staticmethod
     def knowledge_statistics(

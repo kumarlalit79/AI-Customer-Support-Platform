@@ -18,7 +18,8 @@ export const PublicRoute = () => {
 
   if (isAuthenticated) {
     // If user is already authenticated, redirect to the page they were trying to visit, or dashboard
-    const from = (location.state as any)?.from?.pathname || '/dashboard'
+    const from =
+      (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/dashboard'
     return <Navigate to={from} replace />
   }
 

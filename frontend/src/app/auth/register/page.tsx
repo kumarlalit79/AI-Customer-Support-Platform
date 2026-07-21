@@ -25,6 +25,14 @@ const registerSchema = z
 
 type RegisterFormData = z.infer<typeof registerSchema>
 
+type ApiError = {
+  response?: {
+    data?: {
+      detail?: string
+    }
+  }
+}
+
 const RegisterPage = () => {
   const navigate = useNavigate()
   const { login: setAuthData } = useAuthStore()
@@ -73,10 +81,11 @@ const RegisterPage = () => {
       setAuthData(tokenData.access_token, userData)
       navigate('/dashboard', { replace: true })
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       // Clean up token in case of partial error
       useAuthStore.getState().setToken(null)
-      const message = error.response?.data?.detail || 'Registration failed. Email might already exist.'
+      const message =
+        (error as ApiError).response?.data?.detail || 'Registration failed. Email might already exist.'
       setBackendError(message)
     },
   })
@@ -238,7 +247,7 @@ const RegisterPage = () => {
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
               Already have an account?{' '}
               <Link
-                to="/auth/login"
+                to="/login"
                 className="text-purple-600 dark:text-purple-400 font-semibold hover:underline"
               >
                 Sign in

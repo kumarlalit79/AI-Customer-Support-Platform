@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from 'react-router'
 import { useAuthStore } from '../../store/auth'
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, isLoading } = useAuthStore()
+  const { token, isAuthenticated, isLoading } = useAuthStore()
   const location = useLocation()
 
   if (isLoading) {
@@ -16,9 +16,9 @@ export const ProtectedRoute = () => {
     )
   }
 
-  if (!isAuthenticated) {
+  if (!token || !isAuthenticated) {
     // Redirect to login page and store the attempted path
-    return <Navigate to="/auth/login" state={{ from: location }} replace />
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   return <Outlet />

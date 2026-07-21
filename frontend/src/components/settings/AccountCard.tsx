@@ -18,7 +18,7 @@ export function AccountCard() {
     // Small delay for UX feedback
     await new Promise((r) => setTimeout(r, 400))
     logout()
-    navigate('/auth/login', { replace: true })
+    navigate('/login', { replace: true })
   }
 
   return (

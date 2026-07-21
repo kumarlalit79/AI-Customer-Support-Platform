@@ -27,8 +27,11 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Clear auth state in store
+      // Clear auth state in store and force navigation outside React hooks.
       useAuthStore.getState().logout()
+      if (window.location.pathname !== '/login') {
+        window.location.replace('/login')
+      }
     }
     return Promise.reject(error)
   }

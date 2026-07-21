@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router'
+import { useNavigate, Link, useLocation } from 'react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -19,8 +19,17 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>
 
+type ApiError = {
+  response?: {
+    data?: {
+      detail?: string
+    }
+  }
+}
+
 const LoginPage = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { login: setAuthData } = useAuthStore()
   const [showPassword, setShowPassword] = useState(false)
   const [backendError, setBackendError] = useState<string | null>(null)
@@ -52,12 +61,14 @@ const LoginPage = () => {
     },
     onSuccess: ({ tokenData, userData }) => {
       setAuthData(tokenData.access_token, userData)
-      navigate('/dashboard', { replace: true })
+      const from =
+        (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/dashboard'
+      navigate(from, { replace: true })
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       // Reset token to prevent half-logged in states
       useAuthStore.getState().setToken(null)
-      const message = error.response?.data?.detail || 'Invalid email or password.'
+      const message = (error as ApiError).response?.data?.detail || 'Invalid email or password.'
       setBackendError(message)
     },
   })
@@ -173,7 +184,7 @@ const LoginPage = () => {
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
               Don't have an account?{' '}
               <Link
-                to="/auth/register"
+                to="/register"
                 className="text-purple-600 dark:text-purple-400 font-semibold hover:underline"
               >
                 Sign up

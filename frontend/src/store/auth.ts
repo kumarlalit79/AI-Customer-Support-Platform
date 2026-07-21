@@ -2,6 +2,14 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User } from '../types/auth'
 
+const AUTH_STORAGE_KEY = 'auth-storage'
+
+const removeStoredToken = () => {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem(AUTH_STORAGE_KEY)
+  }
+}
+
 interface AuthState {
   user: User | null
   token: string | null
@@ -24,7 +32,17 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
-      setToken: (token) => set({ token }),
+      setToken: (token) => {
+        set((state) => ({
+          token,
+          user: token ? state.user : null,
+          isAuthenticated: token ? state.isAuthenticated : false,
+          error: token ? state.error : null,
+        }))
+        if (!token) {
+          removeStoredToken()
+        }
+      },
       setUser: (user) => set({ user, isAuthenticated: !!user }),
       login: (token, user) =>
         set({
@@ -33,13 +51,15 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           error: null,
         }),
-      logout: () =>
+      logout: () => {
         set({
           token: null,
           user: null,
           isAuthenticated: false,
           error: null,
-        }),
+        })
+        removeStoredToken()
+      },
       setError: (error) => set({ error }),
       setIsLoading: (isLoading) => set({ isLoading }),
     }),
