@@ -7,7 +7,6 @@ interface MarkdownRendererProps {
 }
 
 const components: Components = {
-  // Code blocks and inline code
   code({ className, children, ...props }) {
     const match = /language-(\w+)/.exec(className || '')
     const isInline = !match

@@ -36,7 +36,7 @@ class GenerateNode:
         scores = state.get("retrieval_scores", [])
 
         if scores:
-            best_score = max(scores)  # Cosine similarity: higher score = better match
+            best_score = max(scores) 
 
             confidence = max(
                 0.0,

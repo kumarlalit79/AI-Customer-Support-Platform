@@ -38,7 +38,6 @@ export function EmptyChatState({ onFirstSend }: EmptyChatStateProps) {
           Ask questions about products, policies, troubleshooting, documentation, or anything available in our knowledge base.
         </p>
 
-        {/* Suggestion chips — clicking sends the suggestion as the first message */}
         <div className="flex flex-col gap-2 w-full max-w-sm mb-4">
           {SUGGESTIONS.map(({ icon: Icon, text, color }) => (
             <button
@@ -55,9 +54,8 @@ export function EmptyChatState({ onFirstSend }: EmptyChatStateProps) {
           ))}
         </div>
 
-        {/* New chat hint */}
         <button
-          onClick={() => {}} // Already on the new chat screen
+          onClick={() => {}} 
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 text-sm font-medium transition-all duration-200 cursor-default"
         >
           <MessageSquarePlus className="w-4 h-4" />
@@ -66,7 +64,6 @@ export function EmptyChatState({ onFirstSend }: EmptyChatStateProps) {
         </div>
       </div>
 
-      {/* Input area — functional, sends the first message and creates the conversation */}
       <ChatInput
         onSend={onFirstSend}
         disabled={isGenerating}

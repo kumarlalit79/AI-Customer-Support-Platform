@@ -57,23 +57,20 @@ const RegisterPage = () => {
 
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterFormData) => {
-      // 1. Call registration endpoint (requires full_name)
+     
       await authService.register({
         full_name: data.name,
         email: data.email,
         password: data.password,
       })
 
-      // 2. Perform automatic login to fetch access token
       const tokenData = await authService.login({
         email: data.email,
         password: data.password,
       })
 
-      // Temporary token storage to allow GET /auth/me request to succeed in interceptor
       useAuthStore.getState().setToken(tokenData.access_token)
 
-      // 3. Retrieve user profile info
       const userData = await authService.getCurrentUser()
 
       return { tokenData, userData }
@@ -83,7 +80,6 @@ const RegisterPage = () => {
       navigate(getRoleHomePath(userData.role), { replace: true })
     },
     onError: (error: unknown) => {
-      // Clean up token in case of partial error
       useAuthStore.getState().setToken(null)
       const message =
         (error as ApiError).response?.data?.detail || 'Registration failed. Email might already exist.'
@@ -98,7 +94,6 @@ const RegisterPage = () => {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-radial from-zinc-50 to-zinc-200 dark:from-zinc-900 dark:to-zinc-950 px-4 py-12">
-      {/* Decorative ambient light leaks */}
       <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-purple-500/10 dark:bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[350px] h-[350px] bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
 

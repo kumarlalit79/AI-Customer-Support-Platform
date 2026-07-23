@@ -44,10 +44,7 @@ interface ConfirmationDialogProps {
   onClose: () => void
 }
 
-/**
- * Generic confirmation dialog with variant support (destructive / warning / default).
- * Used for logout, delete, and other irreversible actions.
- */
+
 export function ConfirmationDialog({
   open,
   title,

@@ -1,67 +1,61 @@
-import { useState } from 'react'
-import { PanelLeftClose, PanelLeftOpen, Sparkles } from 'lucide-react'
-import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import { ConversationSidebar } from '../conversation/ConversationSidebar'
-import { ChatWindow } from './ChatWindow'
-import { EmptyChatState } from './EmptyChatState'
-import { useChatStore } from '../../store/chat'
-import { sendChatMessage } from '../../services/chat'
+import { useState } from "react";
+import { PanelLeftClose, PanelLeftOpen, Sparkles } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ConversationSidebar } from "../conversation/ConversationSidebar";
+import { ChatWindow } from "./ChatWindow";
+import { EmptyChatState } from "./EmptyChatState";
+import { useChatStore } from "../../store/chat";
+import { sendChatMessage } from "../../services/chat";
 
 export function ChatLayout() {
-  const queryClient = useQueryClient()
-  const { activeConversationId, setActiveConversationId, setIsGenerating } = useChatStore()
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const queryClient = useQueryClient();
+  const { activeConversationId, setActiveConversationId, setIsGenerating } =
+    useChatStore();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const [pendingFirstMessage, setPendingFirstMessage] = useState<string | null>(null)
+  const [pendingFirstMessage, setPendingFirstMessage] = useState<string | null>(
+    null,
+  );
 
   const handleNewChat = () => {
-    // New chat: clear active conversation, then ChatWindow will create one on first send
-    setActiveConversationId(null)
-    setPendingFirstMessage(null)
-  }
+    setActiveConversationId(null);
+    setPendingFirstMessage(null);
+  };
 
-  /**
-   * Handles sending the FIRST message when no conversation exists yet.
-   * POSTs to /conversations to create one instantly, sets it active,
-   * then passes the text to ChatWindow to trigger the optimistic send.
-   */
   const handleFirstSend = async (text: string) => {
-    if (!text.trim()) return
-    setIsGenerating(true)
+    if (!text.trim()) return;
+    setIsGenerating(true);
     try {
-      // 1. Instantly create the conversation
-      const { createConversation } = await import('../../services/conversations')
-      const conv = await createConversation()
-      
-      // 2. Instruct the new ChatWindow to send this message on mount
-      setPendingFirstMessage(text)
-      
-      // 3. Switch view to ChatWindow instantly
-      setActiveConversationId(conv.id)
-      
-      // 4. Update sidebar
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      const { createConversation } =
+        await import("../../services/conversations");
+      const conv = await createConversation();
+
+      setPendingFirstMessage(text);
+
+      setActiveConversationId(conv.id);
+
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to create conversation'
-      toast.error(msg)
+      const msg =
+        err instanceof Error ? err.message : "Failed to create conversation";
+      toast.error(msg);
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
+  };
 
   return (
     <div className="flex h-full min-h-0 bg-zinc-50 dark:bg-zinc-950 rounded-xl overflow-hidden border border-zinc-200/60 dark:border-zinc-800/60 shadow-sm">
       {/* ── Sidebar (desktop) ──────────────────────────────────────────────── */}
       <div
         className={`hidden lg:flex flex-col transition-all duration-300 overflow-hidden ${
-          sidebarOpen ? 'w-64' : 'w-0'
+          sidebarOpen ? "w-64" : "w-0"
         }`}
       >
         <ConversationSidebar onNewChat={handleNewChat} />
       </div>
 
-      {/* ── Mobile drawer ─────────────────────────────────────────────────── */}
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div
@@ -74,7 +68,6 @@ export function ChatLayout() {
         </div>
       )}
 
-      {/* ── Main chat area ─────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Topbar */}
         <div className="flex items-center gap-3 px-4 h-14 border-b border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 shrink-0">
@@ -97,22 +90,24 @@ export function ChatLayout() {
               <Sparkles className="w-3.5 h-3.5 text-white" />
             </div>
             <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
-              {activeConversationId ? 'AI Chat Agent' : 'Support AI'}
+              {activeConversationId ? "AI Chat Agent" : "Support AI"}
             </span>
           </div>
 
           {/* Status indicator */}
           <div className="ml-auto flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">Online</span>
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">
+              Online
+            </span>
           </div>
         </div>
 
         {/* Content area */}
         <div className="flex-1 flex flex-col min-h-0">
           {activeConversationId ? (
-            <ChatWindow 
-              conversationId={activeConversationId} 
+            <ChatWindow
+              conversationId={activeConversationId}
               initialMessage={pendingFirstMessage || undefined}
               onInitialMessageSent={() => setPendingFirstMessage(null)}
             />
@@ -122,6 +117,5 @@ export function ChatLayout() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

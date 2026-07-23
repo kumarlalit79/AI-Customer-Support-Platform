@@ -9,7 +9,6 @@ function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-// ─── User Message ─────────────────────────────────────────────────────────────
 
 interface UserMessageProps {
   message: Message
@@ -24,19 +23,17 @@ export function UserMessage({ message }: UserMessageProps) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      // ignore
+      // 
     }
   }
 
   return (
     <div className="flex flex-col items-end gap-1 group">
       <div className="flex items-start gap-2 flex-row-reverse">
-        {/* Avatar */}
         <div className="w-8 h-8 rounded-full bg-zinc-700 border border-zinc-600 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-300 select-none">
           U
         </div>
 
-        {/* Bubble */}
         <div className="max-w-[75%] px-4 py-3 rounded-2xl rounded-tr-sm bg-purple-600 text-white shadow-md shadow-purple-700/20">
           <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
             {message.content}
@@ -44,7 +41,6 @@ export function UserMessage({ message }: UserMessageProps) {
         </div>
       </div>
 
-      {/* Actions + time */}
       <div className="flex items-center gap-2 px-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <span className="text-[10px] text-zinc-500">{formatTime(message.created_at)}</span>
         <button
@@ -59,7 +55,6 @@ export function UserMessage({ message }: UserMessageProps) {
   )
 }
 
-// ─── Assistant Message ────────────────────────────────────────────────────────
 
 interface AssistantMessageProps {
   message: Message
@@ -105,7 +100,6 @@ export function AssistantMessage({ message, onRegenerate }: AssistantMessageProp
         </div>
       </div>
 
-      {/* Actions + time */}
       <div className="flex items-center gap-2 px-11 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <span className="text-[10px] text-zinc-500">{formatTime(message.created_at)}</span>
 

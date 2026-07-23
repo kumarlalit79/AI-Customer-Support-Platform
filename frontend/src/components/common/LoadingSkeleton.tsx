@@ -2,15 +2,11 @@ import { cn } from '../../lib/utils'
 
 interface LoadingSkeletonProps {
   className?: string
-  /** Number of skeleton lines to render */
   lines?: number
-  /** If true, renders a rounded-full pill shape */
   rounded?: boolean
 }
 
-/**
- * Generic skeleton loader for any text or block content.
- */
+
 export function LoadingSkeleton({
   className,
   lines = 1,
@@ -33,7 +29,6 @@ export function LoadingSkeleton({
   )
 }
 
-/** Single-line skeleton with custom width */
 export function SkeletonLine({
   width = 'w-full',
   height = 'h-4',
@@ -52,7 +47,6 @@ export function SkeletonLine({
   )
 }
 
-/** Card-level skeleton for list items */
 export function SkeletonCard({ className }: { className?: string }) {
   return (
     <div
@@ -75,7 +69,6 @@ export function SkeletonCard({ className }: { className?: string }) {
   )
 }
 
-/** Stat card skeleton matching StatsCard layout */
 export function SkeletonStatCard({ className }: { className?: string }) {
   return (
     <div

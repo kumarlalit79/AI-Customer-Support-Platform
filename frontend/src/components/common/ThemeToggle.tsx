@@ -15,7 +15,6 @@ const OPTIONS: ThemeOption[] = [
 ]
 
 interface ThemeToggleProps {
-  /** When true, shows a compact icon-only button that cycles through themes */
   compact?: boolean
   className?: string
 }

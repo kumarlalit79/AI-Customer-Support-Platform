@@ -5,11 +5,7 @@ interface ThemeProviderProps {
   children: ReactNode
 }
 
-/**
- * ThemeProvider must be rendered high in the tree.
- * It reads the persisted theme from Zustand and applies
- * the correct 'dark' class to <html> before the first paint.
- */
+
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const theme = useThemeStore((s) => s.theme)
 

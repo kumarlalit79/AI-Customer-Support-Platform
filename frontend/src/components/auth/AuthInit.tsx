@@ -5,8 +5,6 @@ import { authService } from '../../services/auth'
 export const AuthInit = ({ children }: { children: React.ReactNode }) => {
   const { setUser, logout, setIsLoading } = useAuthStore()
   const [isInitialized, setIsInitialized] = useState(false)
-  // Capture the token at mount time only — we only want to validate a
-  // pre-existing persisted token, not re-run after every login/logout.
   const initialToken = useRef(useAuthStore.getState().token)
 
   useEffect(() => {
@@ -18,7 +16,7 @@ export const AuthInit = ({ children }: { children: React.ReactNode }) => {
           setUser(user)
         } catch (error) {
           console.error('Failed to fetch user during session initialization:', error)
-          logout() // Clears token & user on failure (e.g. 401, expired token)
+          logout()
         } finally {
           setIsLoading(false)
         }
@@ -27,8 +25,7 @@ export const AuthInit = ({ children }: { children: React.ReactNode }) => {
     }
 
     initializeAuth()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Intentionally empty: only runs once on mount
+  }, []) 
 
   if (!isInitialized) {
     return (

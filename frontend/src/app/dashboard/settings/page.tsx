@@ -10,7 +10,6 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      {/* Page header */}
       <div className="flex items-center gap-3 mb-8">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center shadow-md shadow-purple-500/20">
           <Settings className="w-5 h-5 text-white" />
@@ -25,7 +24,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Cards */}
       <ProfileCard user={user} />
       <AccountCard />
       <AppearanceCard />

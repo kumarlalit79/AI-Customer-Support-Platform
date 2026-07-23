@@ -36,10 +36,6 @@ class QdrantManager:
 
     @staticmethod
     def ensure_collection_exists():
-        # Only actually check with the server once per process.
-        # Re-checking on every request was adding an extra network
-        # round trip to every upload/delete, which is what was making
-        # us time out more often on a slow/cold connection.
         if QdrantManager._collection_ready:
             return
 

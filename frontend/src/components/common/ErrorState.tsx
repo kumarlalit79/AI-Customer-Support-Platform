@@ -9,10 +9,7 @@ interface ErrorStateProps {
   className?: string
 }
 
-/**
- * Generic reusable error state component for any data-fetch failure.
- * Displays a friendly error message with an optional retry button.
- */
+
 export function ErrorState({
   title = 'Something went wrong',
   message = 'An unexpected error occurred while communicating with the server. Please check your connection and try again.',

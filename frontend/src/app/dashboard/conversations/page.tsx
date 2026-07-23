@@ -115,7 +115,6 @@ export default function ConversationsPage() {
   const [renameTarget, setRenameTarget] = useState<Conversation | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Conversation | null>(null)
 
-  // ─── Fetch ───────────────────────────────────────────────────────────────────
   const {
     data: conversations = [],
     isLoading,
@@ -126,19 +125,16 @@ export default function ConversationsPage() {
     queryFn: getConversations,
   })
 
-  // ─── Search filter (client-side) ─────────────────────────────────────────────
   const filtered = useMemo(() => {
     if (!search.trim()) return conversations
     const q = search.toLowerCase()
     return conversations.filter((c) => c.title.toLowerCase().includes(q))
   }, [conversations, search])
 
-  // ─── Rename mutation ──────────────────────────────────────────────────────────
   const renameMutation = useMutation({
     mutationFn: ({ id, title }: { id: number; title: string }) =>
       renameConversation(id, { title }),
     onMutate: async ({ id, title }) => {
-      // Optimistic update
       await queryClient.cancelQueries({ queryKey: ['conversations'] })
       const previous = queryClient.getQueryData<Conversation[]>(['conversations'])
       queryClient.setQueryData<Conversation[]>(['conversations'], (old = []) =>
@@ -161,11 +157,9 @@ export default function ConversationsPage() {
     },
   })
 
-  // ─── Delete mutation ──────────────────────────────────────────────────────────
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteConversation(id),
     onMutate: async (id) => {
-      // Optimistic remove
       await queryClient.cancelQueries({ queryKey: ['conversations'] })
       const previous = queryClient.getQueryData<Conversation[]>(['conversations'])
       queryClient.setQueryData<Conversation[]>(['conversations'], (old = []) =>
@@ -188,7 +182,6 @@ export default function ConversationsPage() {
     },
   })
 
-  // ─── Handlers ─────────────────────────────────────────────────────────────────
   const handleContinue = (id: number) => {
     setActiveConversationId(id)
     navigate(user?.role === 'customer' ? '/support' : '/dashboard/chat')
@@ -196,7 +189,6 @@ export default function ConversationsPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      {/* Page header */}
       <div className="flex items-center gap-3 mb-2">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center shadow-md shadow-purple-500/20">
           <MessageSquare className="w-5 h-5 text-white" />
@@ -211,7 +203,6 @@ export default function ConversationsPage() {
         </div>
       </div>
 
-      {/* Search bar */}
       {!isError && (
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
@@ -234,7 +225,6 @@ export default function ConversationsPage() {
         </div>
       )}
 
-      {/* Content */}
       {isLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -282,7 +272,6 @@ export default function ConversationsPage() {
         </div>
       )}
 
-      {/* Rename dialog */}
       <RenameDialog
         open={!!renameTarget}
         currentTitle={renameTarget?.title ?? ''}
@@ -293,7 +282,6 @@ export default function ConversationsPage() {
         isPending={renameMutation.isPending}
       />
 
-      {/* Delete confirmation */}
       <ConfirmationDialog
         open={!!deleteTarget}
         title="Delete conversation"

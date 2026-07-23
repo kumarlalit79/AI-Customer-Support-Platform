@@ -26,7 +26,6 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   }
 
   if (!token || !isAuthenticated) {
-    // Redirect to login page and store the attempted path
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 

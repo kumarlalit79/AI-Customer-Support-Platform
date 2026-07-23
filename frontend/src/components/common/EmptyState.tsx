@@ -9,10 +9,7 @@ interface EmptyStateProps {
   className?: string
 }
 
-/**
- * Generic reusable empty-state component used across the app.
- * Pass a lucide icon, title, description, and an optional CTA node.
- */
+
 export function EmptyState({
   icon: Icon,
   title,

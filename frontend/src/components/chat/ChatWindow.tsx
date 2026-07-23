@@ -25,7 +25,6 @@ export function ChatWindow({ conversationId, initialMessage, onInitialMessageSen
   const [showScrollBtn, setShowScrollBtn] = useState(false)
   const hasSentInitialRef = useRef(false)
 
-  // ─── Fetch messages ─────────────────────────────────────────────────────────
   const {
     data: messages = [],
     isLoading,
@@ -37,11 +36,8 @@ export function ChatWindow({ conversationId, initialMessage, onInitialMessageSen
     enabled: !!conversationId,
   })
 
-  // ─── Send message mutation ───────────────────────────────────────────────────
-  // We maintain a local optimistic list for the current session
   const [localMessages, setLocalMessages] = useState<Message[]>([])
 
-  // Sync on fresh load
   useEffect(() => {
     setLocalMessages(messages)
   }, [messages])
@@ -50,7 +46,6 @@ export function ChatWindow({ conversationId, initialMessage, onInitialMessageSen
     mutationFn: sendChatMessage,
     onMutate: (variables) => {
       setIsGenerating(true)
-      // Optimistically add user message
       const optimisticUser: Message = {
         id: Date.now(),
         conversation_id: conversationId,
@@ -61,7 +56,6 @@ export function ChatWindow({ conversationId, initialMessage, onInitialMessageSen
       setLocalMessages((prev) => [...prev, optimisticUser])
     },
     onSuccess: (data) => {
-      // If backend created a new conversation, update active
       if (data.conversation_id && data.conversation_id !== conversationId) {
         setActiveConversationId(data.conversation_id)
       }
@@ -77,7 +71,6 @@ export function ChatWindow({ conversationId, initialMessage, onInitialMessageSen
       }
       setLocalMessages((prev) => [...prev, aiMessage])
 
-      // Invalidate conversations list (title may have been auto-set)
       queryClient.invalidateQueries({ queryKey: ['conversations'] })
       queryClient.invalidateQueries({ queryKey: ['messages', data.conversation_id] })
     },
@@ -90,7 +83,6 @@ export function ChatWindow({ conversationId, initialMessage, onInitialMessageSen
     },
   })
 
-  // ─── Auto-scroll ─────────────────────────────────────────────────────────────
   const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
     bottomRef.current?.scrollIntoView({ behavior })
   }, [])
@@ -99,7 +91,6 @@ export function ChatWindow({ conversationId, initialMessage, onInitialMessageSen
     scrollToBottom('smooth')
   }, [localMessages, isGenerating, scrollToBottom])
 
-  // ─── Scroll-to-bottom button visibility ──────────────────────────────────────
   const handleScroll = () => {
     const el = scrollContainerRef.current
     if (!el) return
@@ -107,7 +98,6 @@ export function ChatWindow({ conversationId, initialMessage, onInitialMessageSen
     setShowScrollBtn(distFromBottom > 200)
   }
 
-  // ─── Send handler ─────────────────────────────────────────────────────────────
   const handleSend = useCallback((text: string) => {
     if (isGenerating) return
     sendMutation.mutate({
@@ -116,7 +106,6 @@ export function ChatWindow({ conversationId, initialMessage, onInitialMessageSen
     })
   }, [isGenerating, sendMutation, conversationId])
 
-  // ─── Initial Message Trigger ──────────────────────────────────────────────────
   useEffect(() => {
     if (initialMessage && !hasSentInitialRef.current && !isGenerating) {
       hasSentInitialRef.current = true
@@ -125,7 +114,6 @@ export function ChatWindow({ conversationId, initialMessage, onInitialMessageSen
     }
   }, [initialMessage, isGenerating, handleSend, onInitialMessageSent])
 
-  // ─── Loading & error states ──────────────────────────────────────────────────
   if (isLoading) {
     return (
       <div className="flex-1 flex flex-col min-h-0">
