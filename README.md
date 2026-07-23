@@ -1,33 +1,36 @@
 # 🚀 Support AI Platform
 
-> An Agentic RAG-powered customer support platform that enables organizations to build private AI assistants from their own knowledge base.
+> An agentic RAG-powered customer support platform that lets organizations build private AI assistants from their own knowledge base.
 
 ---
 
-# 🔗 Demo
+## 🔗 Demo
 
 ### 🎥 Demo Video
-> https://youtu.be/EXOKhftiq_A
 
-### 🌐 Live Demo
-> 
+[![Watch Demo](https://img.youtube.com/vi/EXOKhftiq_A/maxresdefault.jpg)](https://youtu.be/EXOKhftiq_A)
+
 ---
 
 ## 📸 Screenshots
+
 ### Admin Dashboard
-![Admin Dashboard](docs/images/dashboard.png)
+
+![Admin Dashboard](docs/dashboard.png)
 
 ### Knowledge Base
-![Knowledge Base](docs/images/knowledge-base.png)
+
+![Knowledge Base](docs/knowledge-base.png)
 
 ### Customer Chat
-![Customer Chat](docs/images/customer-chat.png)
+
+![Customer Chat](docs/customer-chat.png)
 
 ---
 
-# 📋 Description
+## 📋 Description
 
-Support AI Platform is a full-stack AI customer support application that allows organizations to upload their internal documents and instantly create a private AI assistant capable of answering customer questions.
+Support AI Platform is a full-stack AI customer support application that allows organizations to upload internal documents and instantly create a private AI assistant capable of answering customer questions.
 
 Instead of relying only on an LLM, the platform uses an **Agentic Retrieval-Augmented Generation (RAG)** pipeline built with **LangGraph**, **Qdrant**, and **FastAPI** to retrieve relevant knowledge, rewrite poor queries, detect hallucinations, provide source citations, and maintain conversation history.
 
@@ -35,7 +38,7 @@ The platform includes separate **Admin** and **Customer** portals, making it clo
 
 ---
 
-# ⚙️ Tech Stack
+## ⚙️ Tech Stack
 
 ### Frontend
 
@@ -62,260 +65,113 @@ The platform includes separate **Admin** and **Customer** portals, making it clo
 
 ---
 
-# ✨ Features
+## ✨ Features
 
 ### Authentication
 
-- JWT Authentication
-- Role-based Access (Admin & Customer)
-- Protected Routes
-- Persistent Login
+- JWT authentication
+- Role-based access for admins and customers
+- Protected routes
+- Persistent login
 
 ### Knowledge Base
 
-- Upload PDF
-- Upload TXT
-- Upload DOCX
-- Upload Markdown
-- Upload FAQ
-- Delete Documents
-- Re-index Documents
+- Upload PDF, TXT, DOCX, Markdown, and FAQ documents
+- Delete documents
+- Re-index documents
+- Store vectorized chunks in Qdrant
 
 ### AI
 
-- Agentic RAG
-- LangGraph Workflow
-- Retrieval Grading
-- Query Rewrite Loop
-- Hallucination Detection
-- Source Citations
-- Confidence Score
-- Conversation Memory
+- Agentic RAG workflow
+- LangGraph orchestration
+- Retrieval grading
+- Query rewrite loop
+- Hallucination detection
+- Source citations
+- Confidence score
+- Conversation memory
 
 ### Dashboard
 
-- Admin Analytics
-- Document Statistics
-- Recent Uploads
-- Recent Conversations
+- Admin analytics
+- Document statistics
+- Recent uploads
+- Recent conversations
 
 ### Customer Portal
 
-- AI Chat
-- Conversation History
+- AI chat
+- Conversation history
 - Profile
-- Role-Based Navigation
+- Role-based navigation
 
 ---
 
-# 🧠 Agentic AI Pipeline
+## 🧠 Agentic AI Pipeline
 
-> **Architecture Diagram**
+```mermaid
+flowchart TD
+    A[User question] --> B[Load conversation memory]
+    B --> C[Attach previous messages]
+    C --> D[Create LangGraph state]
+    D --> E[Retrieve from Qdrant]
+    E --> F[Top-k documents and similarity scores]
+    F --> G[Remove duplicate chunks]
+    G --> H[Build context and retrieval scores]
+    H --> I{Retrieved documents relevant?}
 
+    I -- Yes --> J[Generate answer]
+    I -- No --> K[Rewrite query]
+    K --> L[Increment rewrite count]
+    L --> M{Rewrite attempts left?}
+    M -- Yes --> E
+    M -- No --> N[End with fallback response]
 
-```
-
-                                        USER QUESTION
-                                              │
-                                              ▼
-                               Conversation Memory Loaded
-                                              │
-                                              ▼
-                                Previous Messages Attached
-                                              │
-                                              ▼
-                                  LangGraph State Created
-                                              │
-                                              ▼
-──────────────────────────────────────────────────────────────────────────────
-
-                                   RETRIEVE NODE
-                                              │
-                    Original Question → Qdrant Similarity Search
-                                              │
-                                              ▼
-                           Top-k Documents + Similarity Scores
-                                              │
-                                              ▼
-                                Duplicate Chunk Removal
-                                              │
-                                              ▼
-                               Context + Retrieval Scores
-
-──────────────────────────────────────────────────────────────────────────────
-
-                               RETRIEVAL GRADER NODE
-                                              │
-                                              ▼
-                   LLM checks whether retrieved documents are relevant
-                                              │
-                          Returns only: YES / NO
-                                              │
-                                              ▼
-
-                     ┌─────────────────────────────────────────┐
-                     │ retrieval_ok == "yes" ?                 │
-                     └─────────────────────────────────────────┘
-                           │                         │
-                         YES                        NO
-                           │                         │
-                           ▼                         ▼
-                    GENERATE NODE            REWRITE QUERY NODE
-                                                    │
-                                 Rewrite question using LLM
-                                                    │
-                                                    ▼
-                                    rewrite_count += 1
-                                                    │
-                                                    ▼
-                                           Retrieve Again
-                                                    │
-                                                    │
-                              Maximum Rewrite Count = 2
-                                                    │
-                                       if exceeded → END
-
-──────────────────────────────────────────────────────────────────────────────
-
-                                  GENERATE NODE
-                                              │
-                                              ▼
-                Merge Retrieved Context into One Prompt
-                                              │
-                Merge Conversation History into Prompt
-                                              │
-                Original / Rewritten Question
-                                              │
-                                              ▼
-                            RAG Prompt Template
-                                              │
-                                              ▼
-                                   Chat Model
-                                              │
-                                              ▼
-                                 Final AI Answer
-                                              │
-                                              ▼
-                          Source Citation Generation
-                                              │
-                                              ▼
-                     Confidence Score Calculation
-                 (Based on Retrieval Similarity Scores)
-
-──────────────────────────────────────────────────────────────────────────────
-
-                             HALLUCINATION CHECK NODE
-                                              │
-                                              ▼
-            LLM compares Generated Answer with Retrieved Context
-                                              │
-                  Is answer grounded in retrieved documents?
-                                              │
-                   Returns only YES / NO
-                                              │
-                                              ▼
-
-                     ┌─────────────────────────────────────────┐
-                     │ hallucination_ok == "yes" ?             │
-                     └─────────────────────────────────────────┘
-                           │                         │
-                         YES                        NO
-                           │                         │
-                           ▼                         ▼
-                        RETURN                Generate Again
-                                                   │
-                                      generation_count += 1
-                                                   │
-                                                   ▼
-                                        Maximum = 2 Attempts
-                                                   │
-                                        if exceeded → RETURN
-
-──────────────────────────────────────────────────────────────────────────────
-
-                                    FINAL RESPONSE
-                                              │
-                                              ▼
-                                        {
-                                        Answer,
-                                        Confidence Score,
-                                        Source Citations,
-                                        Conversation ID
-                                        }
-                                              │
-                                              ▼
-                               Save Assistant Message
-                                              │
-                                              ▼
-                                   Return to Frontend
-
-
-
-
-```
+    J --> O[Generate source citations]
+    O --> P[Calculate confidence score]
+    P --> Q{Answer grounded in context?}
+    Q -- Yes --> R[Save assistant message]
+    Q -- No --> S[Generate again]
+    S --> T{Generation attempts left?}
+    T -- Yes --> J
+    T -- No --> R
+    R --> U[Return answer, confidence, citations, conversation ID]
 ```
 
 ---
 
-# 🔄 How It Works
+## 🔄 How It Works
 
 ### Knowledge Ingestion
 
+```mermaid
+flowchart TD
+    A[Admin] --> B[Upload document]
+    B --> C[Extract text]
+    C --> D[Chunk document]
+    D --> E[Generate embeddings]
+    E --> F[Store vectors in Qdrant]
+    F --> G[Knowledge base ready]
 ```
-Admin
-   │
-   ▼
-Upload Document
-   │
-   ▼
-Extract Text
-   │
-   ▼
-Chunk Document
-   │
-   ▼
-Generate Embeddings
-   │
-   ▼
-Store in Qdrant
-   │
-   ▼
-Knowledge Base Ready
-```
-
----
 
 ### AI Question Answering
 
+```mermaid
+flowchart TD
+    A[Customer question] --> B[Load conversation memory]
+    B --> C[Retrieve documents]
+    C --> D[Grade retrieval quality]
+    D --> E{Relevant context?}
+    E -- Yes --> F[Generate response]
+    E -- No --> G[Rewrite query]
+    G --> C
+    F --> H[Run hallucination check]
+    H --> I{Grounded answer?}
+    I -- Yes --> J[Add source citations]
+    I -- No --> F
+    J --> K[Return final answer]
 ```
-Customer Question
-        │
-        ▼
-Conversation Memory
-        │
-        ▼
-Retrieve Documents
-        │
-        ▼
-Retrieval Grading
-        │
-        ▼
-Rewrite Query (if needed)
-        │
-        ▼
-Generate Response
-        │
-        ▼
-Hallucination Check
-        │
-        ▼
-Source Citation
-        │
-        ▼
-Final Answer
-```
-
----
 
 ### End-to-End Flow
 
@@ -332,253 +188,203 @@ Final Answer
 
 ---
 
-# 🤖 AI Workflow
+## 🤖 AI Workflow
 
-```
-User Question
-      │
-      ▼
-Conversation Memory
-      │
-      ▼
-Retrieve Documents
-      │
-      ▼
-Retrieval Grading
-      │
-      ├───────────────┐
-      │               │
-   Relevant?         No
-      │               │
-      ▼               ▼
-Generate        Rewrite Query
-      │               │
-      └───────┬───────┘
-              ▼
-      Hallucination Check
-              │
-      ┌───────┴────────┐
-      │                │
-     Yes              No
-      │                │
-      ▼                ▼
-   Return         Generate Again
-      │
-      ▼
-Save Conversation
-      │
-      ▼
-Frontend Response
+```mermaid
+flowchart LR
+    A[User question] --> B[Conversation memory]
+    B --> C[Retrieve documents]
+    C --> D{Retrieval relevant?}
+    D -- Yes --> E[Generate answer]
+    D -- No --> F[Rewrite query]
+    F --> C
+    E --> G{Hallucination check passed?}
+    G -- Yes --> H[Save conversation]
+    G -- No --> E
+    H --> I[Frontend response]
 ```
 
 ---
 
-# 📂 Project Structure
+## 📂 Project Structure
 
-```
+```text
 Support-AI-Platform
-│
-├── frontend
-│   ├── src
-│   │   ├── app
-│   │   ├── components
-│   │   ├── hooks
-│   │   ├── services
-│   │   ├── store
-│   │   ├── lib
-│   │   └── types
-│
 ├── backend
-│   ├── app
-│   │   ├── api
-│   │   ├── ai
-│   │   │   ├── graphs
-│   │   │   ├── nodes
-│   │   │   ├── prompts
-│   │   │   ├── retrievers
-│   │   │   ├── vectorstores
-│   │   │   ├── embeddings
-│   │   │   └── splitters
-│   │   ├── models
-│   │   ├── schemas
-│   │   ├── services
-│   │   └── uploads
-│
+│   └── app
+│       ├── ai
+│       │   ├── embeddings
+│       │   ├── graphs
+│       │   ├── nodes
+│       │   ├── prompts
+│       │   ├── retrievers
+│       │   ├── splitters
+│       │   └── vectorstores
+│       ├── api
+│       ├── models
+│       ├── schemas
+│       ├── services
+│       └── uploads
+├── docs
+│   ├── customer-chat.png
+│   ├── dashboard.png
+│   └── knowledge-base.png
+├── frontend
+│   └── src
+│       ├── app
+│       ├── components
+│       ├── hooks
+│       ├── lib
+│       ├── services
+│       ├── store
+│       └── types
 └── README.md
 ```
 
 ---
 
-# 🏗️ Architecture
+## 🏗️ Architecture
 
-```
-React Frontend
-        │
-        ▼
-FastAPI Backend
-        │
-        ▼
-Authentication
-        │
-        ▼
-LangGraph Agent
-        │
-        ▼
-Qdrant Vector DB
-        │
-        ▼
-OpenAI
+```mermaid
+flowchart TD
+    A[React frontend] --> B[FastAPI backend]
+    B --> C[Authentication and API services]
+    C --> D[LangGraph agent]
+    D --> E[Qdrant vector database]
+    D --> F[OpenAI]
+    E --> D
+    F --> D
+    D --> B
+    B --> A
 ```
 
 ---
 
-# 🚀 Getting Started
+## 🚀 Getting Started
 
-## Prerequisites
+### Prerequisites
 
 - Python 3.12+
 - Node.js 20+
 - PostgreSQL
 - Qdrant
-- OpenAI API Key
+- OpenAI API key
 
----
+### Installation
 
-## Installation
-
-### Clone
+#### Clone
 
 ```bash
 git clone https://github.com/kumarlalit79/support-ai-platform.git
-
 cd support-ai-platform
 ```
 
----
-
-### Backend
+#### Backend
 
 ```bash
 cd backend
-
 python -m venv myenv
-
 myenv\Scripts\activate
-
 pip install -r requirements.txt
-
 uvicorn app.main:app --reload
 ```
 
----
-
-### Frontend
+#### Frontend
 
 ```bash
 cd frontend
-
 npm install
-
 npm run dev
 ```
 
 ---
 
-# 🔐 Environment Variables
+## 🔐 Environment Variables
 
-Backend
-
-| Variable | Description |
-|-----------|-------------|
-| DATABASE_URL | PostgreSQL Connection |
-| OPENAI_API_KEY | OpenAI API Key |
-| OPENAI_MODEL | Chat Model |
-| OPENAI_EMBEDDING_MODEL | Embedding Model |
-| OPENAI_BASE_URL | OpenAI Base URL |
-| JWT_SECRET_KEY | JWT Secret |
-| QDRANT_URL | Qdrant URL |
-| QDRANT_API_KEY | Qdrant API Key |
-| QDRANT_COLLECTION_NAME | Collection Name |
-
-Frontend
+### Backend
 
 | Variable | Description |
-|-----------|-------------|
-| VITE_API_URL | Backend API URL |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `OPENAI_API_KEY` | OpenAI API key |
+| `OPENAI_MODEL` | Chat model |
+| `OPENAI_EMBEDDING_MODEL` | Embedding model |
+| `OPENAI_BASE_URL` | OpenAI base URL |
+| `JWT_SECRET_KEY` | JWT secret |
+| `QDRANT_URL` | Qdrant URL |
+| `QDRANT_API_KEY` | Qdrant API key |
+| `QDRANT_COLLECTION_NAME` | Collection name |
+
+### Frontend
+
+| Variable | Description |
+| --- | --- |
+| `VITE_API_URL` | Backend API URL |
 
 ---
 
-# 🔌 API Endpoints
+## 🔌 API Endpoints
 
-## Authentication
+### Authentication
 
 | Method | Endpoint |
-|----------|----------------|
-| POST | /auth/register |
-| POST | /auth/login |
-| GET | /auth/me |
+| --- | --- |
+| `POST` | `/auth/register` |
+| `POST` | `/auth/login` |
+| `GET` | `/auth/me` |
 
----
-
-## Knowledge Base
+### Knowledge Base
 
 | Method | Endpoint |
-|----------|-----------------------------|
-| POST | /documents/upload/pdf |
-| POST | /documents/upload/txt |
-| POST | /documents/upload/docx |
-| POST | /documents/upload/markdown |
-| POST | /documents/upload/faq |
-| GET | /documents |
-| DELETE | /documents/{id} |
-| POST | /documents/{id}/reindex |
+| --- | --- |
+| `POST` | `/documents/upload/pdf` |
+| `POST` | `/documents/upload/txt` |
+| `POST` | `/documents/upload/docx` |
+| `POST` | `/documents/upload/markdown` |
+| `POST` | `/documents/upload/faq` |
+| `GET` | `/documents` |
+| `DELETE` | `/documents/{id}` |
+| `POST` | `/documents/{id}/reindex` |
 
----
-
-## Chat
+### Chat
 
 | Method | Endpoint |
-|----------|-------------|
-| POST | /chat |
+| --- | --- |
+| `POST` | `/chat` |
 
----
-
-## Conversations
+### Conversations
 
 | Method | Endpoint |
-|----------|----------------|
-| GET | /conversations |
-| PATCH | /conversations/{id} |
-| DELETE | /conversations/{id} |
+| --- | --- |
+| `GET` | `/conversations` |
+| `PATCH` | `/conversations/{id}` |
+| `DELETE` | `/conversations/{id}` |
 
----
-
-## Dashboard
+### Dashboard
 
 | Method | Endpoint |
-|----------|----------------|
-| GET | /dashboard-api |
-| GET | /documents/statistics |
+| --- | --- |
+| `GET` | `/dashboard-api` |
+| `GET` | `/documents/statistics` |
 
 ---
 
-# 🎯 Future Improvements
+## 🎯 Future Improvements
 
-- Streaming Responses
-- Website Chat Widget
-- Human Agent Handoff
-- Multi-language Support
-- Analytics Dashboard
-- Feedback & Rating System
+- Streaming responses
+- Website chat widget
+- Human agent handoff
+- Multi-language support
+- Analytics dashboard
+- Feedback and rating system
 
 ---
 
-# 👨‍💻 Author
+## 👨‍💻 Author
 
 **Lalit Kumar**
 
-GitHub: https://github.com/kumarlalit79
-
+GitHub: <https://github.com/kumarlalit79>
 
 ---
 
