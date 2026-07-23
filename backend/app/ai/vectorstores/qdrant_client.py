@@ -1,10 +1,12 @@
 from uuid import uuid4
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
-from qdrant_client.http.exceptions import UnexpectedResponse
+from qdrant_client.http.exceptions import UnexpectedResponse, ResponseHandlingException
 from qdrant_client.models import Distance, VectorParams, Filter, FieldCondition, MatchValue, PayloadSchemaType
 from app.ai.embeddings.embedding_model import EmbeddingModel
 from app.core.config import settings
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
+
 
 class QdrantManager:
 
@@ -24,6 +26,15 @@ class QdrantManager:
         return QdrantManager._client
 
     @staticmethod
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_fixed(2),
+        retry=retry_if_exception_type(ResponseHandlingException),
+    )
+    def _get_collections_with_retry(client):
+        return client.get_collections().collections
+
+    @staticmethod
     def ensure_collection_exists():
         # Only actually check with the server once per process.
         # Re-checking on every request was adding an extra network
@@ -34,7 +45,7 @@ class QdrantManager:
 
         client = QdrantManager.get_client()
 
-        collections = client.get_collections().collections
+        collections = QdrantManager._get_collections_with_retry(client)
         collection_names = [c.name for c in collections]
 
         if settings.QDRANT_COLLECTION not in collection_names:
@@ -58,7 +69,6 @@ class QdrantManager:
             print("Qdrant collection created successfully.")
 
         QdrantManager._collection_ready = True
-
 
     @staticmethod
     def get_vectorstore():
