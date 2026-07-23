@@ -36,11 +36,11 @@ class GenerateNode:
         scores = state.get("retrieval_scores", [])
 
         if scores:
-            best_score = min(scores)  # Qdrant distance: smaller is better
+            best_score = max(scores)  # Cosine similarity: higher score = better match
 
             confidence = max(
                 0.0,
-                min(1.0, 1 - best_score)
+                min(1.0, best_score)
             )
         else:
             confidence = 0.0

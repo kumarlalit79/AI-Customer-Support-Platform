@@ -19,11 +19,14 @@ def upload_document(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    return DocumentService.upload_document(
-        db=db,
-        file=file,
-        user_id=current_user.id
-    )
+    try:
+        return DocumentService.upload_document(
+            db=db,
+            file=file,
+            user_id=current_user.id
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
 @router.get(
     "/statistics",
@@ -140,15 +143,14 @@ def upload_txt(
 
 ):
 
-    return DocumentService.upload_txt(
-
-        db=db,
-
-        file=file,
-
-        user_id=current_user.id,
-
-    )
+    try:
+        return DocumentService.upload_txt(
+            db=db,
+            file=file,
+            user_id=current_user.id,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
 @router.post(
     "/upload/docx",
@@ -159,11 +161,14 @@ def upload_docx(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return DocumentService.upload_docx(
-        db=db,
-        file=file,
-        user_id=current_user.id,
-    )
+    try:
+        return DocumentService.upload_docx(
+            db=db,
+            file=file,
+            user_id=current_user.id,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
 @router.post(
     "/upload/markdown",
@@ -179,15 +184,14 @@ def upload_markdown(
 
 ):
 
-    return DocumentService.upload_markdown(
-
-        db=db,
-
-        file=file,
-
-        user_id=current_user.id,
-
-    )
+    try:
+        return DocumentService.upload_markdown(
+            db=db,
+            file=file,
+            user_id=current_user.id,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
 @router.post(
     "/upload/faq",
@@ -203,15 +207,14 @@ def upload_faq(
 
     ):
 
-        return DocumentService.upload_faq(
-
-            db=db,
-
-            request=request,
-
-            user_id=current_user.id,
-
-        )
+        try:
+            return DocumentService.upload_faq(
+                db=db,
+                request=request,
+                user_id=current_user.id,
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
         
 
         

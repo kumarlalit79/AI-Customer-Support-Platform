@@ -13,25 +13,37 @@ export function ChatLayout() {
   const { activeConversationId, setActiveConversationId, setIsGenerating } = useChatStore()
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
+  const [pendingFirstMessage, setPendingFirstMessage] = useState<string | null>(null)
+
   const handleNewChat = () => {
     // New chat: clear active conversation, then ChatWindow will create one on first send
     setActiveConversationId(null)
+    setPendingFirstMessage(null)
   }
 
   /**
    * Handles sending the FIRST message when no conversation exists yet.
-   * POSTs to /chat with no conversation_id, backend creates one and returns it,
-   * then we set it as active so ChatWindow takes over.
+   * POSTs to /conversations to create one instantly, sets it active,
+   * then passes the text to ChatWindow to trigger the optimistic send.
    */
   const handleFirstSend = async (text: string) => {
     if (!text.trim()) return
     setIsGenerating(true)
     try {
-      const response = await sendChatMessage({ question: text, conversation_id: null })
-      setActiveConversationId(response.conversation_id)
+      // 1. Instantly create the conversation
+      const { createConversation } = await import('../../services/conversations')
+      const conv = await createConversation()
+      
+      // 2. Instruct the new ChatWindow to send this message on mount
+      setPendingFirstMessage(text)
+      
+      // 3. Switch view to ChatWindow instantly
+      setActiveConversationId(conv.id)
+      
+      // 4. Update sidebar
       queryClient.invalidateQueries({ queryKey: ['conversations'] })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to send message'
+      const msg = err instanceof Error ? err.message : 'Failed to create conversation'
       toast.error(msg)
     } finally {
       setIsGenerating(false)
@@ -99,7 +111,11 @@ export function ChatLayout() {
         {/* Content area */}
         <div className="flex-1 flex flex-col min-h-0">
           {activeConversationId ? (
-            <ChatWindow conversationId={activeConversationId} />
+            <ChatWindow 
+              conversationId={activeConversationId} 
+              initialMessage={pendingFirstMessage || undefined}
+              onInitialMessageSent={() => setPendingFirstMessage(null)}
+            />
           ) : (
             <EmptyChatState onFirstSend={handleFirstSend} />
           )}

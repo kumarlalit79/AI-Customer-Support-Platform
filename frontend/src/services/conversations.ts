@@ -7,6 +7,12 @@ export const getConversations = async (): Promise<Conversation[]> => {
   return data
 }
 
+// POST /conversations
+export const createConversation = async (): Promise<Conversation> => {
+  const { data } = await apiClient.post<Conversation>('/conversations')
+  return data
+}
+
 // GET /conversations/search?query=...
 export const searchConversations = async (query: string): Promise<Conversation[]> => {
   const { data } = await apiClient.get<Conversation[]>('/conversations/search', {

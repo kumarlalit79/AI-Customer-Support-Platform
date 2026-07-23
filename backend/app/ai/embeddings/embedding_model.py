@@ -7,6 +7,8 @@ class EmbeddingModel:
         embeddings = OpenAIEmbeddings(
             model=settings.OPENAI_EMBEDDING_MODEL,
             api_key=settings.OPENAI_API_KEY,
-            base_url=settings.OPENAI_BASE_URL
+            base_url=settings.OPENAI_BASE_URL,
+            timeout=30,
+            max_retries=3,
         )
         return embeddings

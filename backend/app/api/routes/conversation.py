@@ -15,6 +15,20 @@ router = APIRouter(
     tags=["Conversations"],
 )
 
+@router.post(
+    "",
+    response_model=ConversationResponse,
+)
+def create_conversation(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return ChatService.get_or_create_conversation(
+        db=db,
+        conversation_id=None,
+        user_id=current_user.id,
+    )
+
 
 @router.get(
     "",

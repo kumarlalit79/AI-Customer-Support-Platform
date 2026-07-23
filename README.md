@@ -428,7 +428,7 @@ Frontend
 
 | Method | Endpoint |
 |----------|----------------|
-| GET | /dashboard |
+| GET | /dashboard-api |
 | GET | /documents/statistics |
 
 ---

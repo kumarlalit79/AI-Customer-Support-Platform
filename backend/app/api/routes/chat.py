@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+import traceback
 from app.ai.graphs.support_graph import graph
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -70,9 +71,11 @@ def chat(
             error=None
         )
     except Exception as e:
+        traceback.print_exc()
+        conv_id = conversation.id if 'conversation' in locals() else 0
         return ChatResponse(
             success=False,
-            conversation_id=0,
+            conversation_id=conv_id,
             answer="",
             confidence=0,
             sources=[],

@@ -9,16 +9,29 @@ from app.core.config import settings
 class QdrantManager:
 
     VECTOR_SIZE = 1536
-        
+    _client = None
+    _collection_ready = False
+    _vectorstore = None
+
     @staticmethod
     def get_client():
-        return QdrantClient(
-            url=settings.QDRANT_URL,
-            api_key=settings.QDRANT_API_KEY
-        )
-    
+        if QdrantManager._client is None:
+            QdrantManager._client = QdrantClient(
+                url=settings.QDRANT_URL,
+                api_key=settings.QDRANT_API_KEY,
+                timeout=30,
+            )
+        return QdrantManager._client
+
     @staticmethod
     def ensure_collection_exists():
+        # Only actually check with the server once per process.
+        # Re-checking on every request was adding an extra network
+        # round trip to every upload/delete, which is what was making
+        # us time out more often on a slow/cold connection.
+        if QdrantManager._collection_ready:
+            return
+
         client = QdrantManager.get_client()
 
         collections = client.get_collections().collections
@@ -43,19 +56,21 @@ class QdrantManager:
             )
 
             print("Qdrant collection created successfully.")
-    
-    
+
+        QdrantManager._collection_ready = True
+
+
     @staticmethod
     def get_vectorstore():
-        QdrantManager.ensure_collection_exists()
-        embeddings = EmbeddingModel.get_embeddings()
-        vectorstore = QdrantVectorStore.from_existing_collection(
-            embedding=embeddings,
-            collection_name=settings.QDRANT_COLLECTION,
-            url=settings.QDRANT_URL,
-            api_key=settings.QDRANT_API_KEY
-        )
-        return vectorstore
+        if QdrantManager._vectorstore is None:
+            QdrantManager.ensure_collection_exists()
+            embeddings = EmbeddingModel.get_embeddings()
+            QdrantManager._vectorstore = QdrantVectorStore(
+                client=QdrantManager.get_client(),
+                collection_name=settings.QDRANT_COLLECTION,
+                embedding=embeddings,
+            )
+        return QdrantManager._vectorstore
 
     @staticmethod
     def add_documents(chunks):
@@ -66,7 +81,7 @@ class QdrantManager:
             ids=ids,
         )
         return ids
-    
+
     @staticmethod
     def delete_document(document_id: int):
         QdrantManager.ensure_collection_exists()

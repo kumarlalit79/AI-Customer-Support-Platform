@@ -13,14 +13,17 @@ import type { Message, Source } from '../../types/chat'
 
 interface ChatWindowProps {
   conversationId: number
+  initialMessage?: string
+  onInitialMessageSent?: () => void
 }
 
-export function ChatWindow({ conversationId }: ChatWindowProps) {
+export function ChatWindow({ conversationId, initialMessage, onInitialMessageSent }: ChatWindowProps) {
   const queryClient = useQueryClient()
   const { isGenerating, setIsGenerating, setActiveConversationId } = useChatStore()
   const bottomRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [showScrollBtn, setShowScrollBtn] = useState(false)
+  const hasSentInitialRef = useRef(false)
 
   // ─── Fetch messages ─────────────────────────────────────────────────────────
   const {
@@ -105,13 +108,22 @@ export function ChatWindow({ conversationId }: ChatWindowProps) {
   }
 
   // ─── Send handler ─────────────────────────────────────────────────────────────
-  const handleSend = (text: string) => {
+  const handleSend = useCallback((text: string) => {
     if (isGenerating) return
     sendMutation.mutate({
       question: text,
       conversation_id: conversationId,
     })
-  }
+  }, [isGenerating, sendMutation, conversationId])
+
+  // ─── Initial Message Trigger ──────────────────────────────────────────────────
+  useEffect(() => {
+    if (initialMessage && !hasSentInitialRef.current && !isGenerating) {
+      hasSentInitialRef.current = true
+      handleSend(initialMessage)
+      onInitialMessageSent?.()
+    }
+  }, [initialMessage, isGenerating, handleSend, onInitialMessageSent])
 
   // ─── Loading & error states ──────────────────────────────────────────────────
   if (isLoading) {

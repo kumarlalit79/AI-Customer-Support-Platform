@@ -12,12 +12,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      // Proxy ALL backend API paths to FastAPI dev server
       '/auth': { target: 'http://localhost:8000', changeOrigin: true },
       '/chat': { target: 'http://localhost:8000', changeOrigin: true },
       '/conversations': { target: 'http://localhost:8000', changeOrigin: true },
       '/documents': { target: 'http://localhost:8000', changeOrigin: true },
-      '/dashboard': { target: 'http://localhost:8000', changeOrigin: true },
+      '/dashboard-api': { target: 'http://localhost:8000', changeOrigin: true },
       '/health': { target: 'http://localhost:8000', changeOrigin: true },
     },
   },
