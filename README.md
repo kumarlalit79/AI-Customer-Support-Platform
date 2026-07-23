@@ -7,17 +7,13 @@
 # 🔗 Demo
 
 ### 🎥 Demo Video
-> Add Loom / YouTube Demo Link
+> https://youtu.be/EXOKhftiq_A
 
 ### 🌐 Live Demo
-> Add Live URL
-
+> 
 ---
 
 ## 📸 Screenshots
-
-> Add screenshots here
-
 ### Admin Dashboard
 ![Admin Dashboard](docs/images/dashboard.png)
 
@@ -116,14 +112,147 @@ The platform includes separate **Admin** and **Customer** portals, making it clo
 
 > **Architecture Diagram**
 
-```
-[ Add Agentic RAG Graph Here ]
-```
-
-Suggested image:
 
 ```
-docs/images/agentic-rag-pipeline.png
+
+                                        USER QUESTION
+                                              │
+                                              ▼
+                               Conversation Memory Loaded
+                                              │
+                                              ▼
+                                Previous Messages Attached
+                                              │
+                                              ▼
+                                  LangGraph State Created
+                                              │
+                                              ▼
+──────────────────────────────────────────────────────────────────────────────
+
+                                   RETRIEVE NODE
+                                              │
+                    Original Question → Qdrant Similarity Search
+                                              │
+                                              ▼
+                           Top-k Documents + Similarity Scores
+                                              │
+                                              ▼
+                                Duplicate Chunk Removal
+                                              │
+                                              ▼
+                               Context + Retrieval Scores
+
+──────────────────────────────────────────────────────────────────────────────
+
+                               RETRIEVAL GRADER NODE
+                                              │
+                                              ▼
+                   LLM checks whether retrieved documents are relevant
+                                              │
+                          Returns only: YES / NO
+                                              │
+                                              ▼
+
+                     ┌─────────────────────────────────────────┐
+                     │ retrieval_ok == "yes" ?                 │
+                     └─────────────────────────────────────────┘
+                           │                         │
+                         YES                        NO
+                           │                         │
+                           ▼                         ▼
+                    GENERATE NODE            REWRITE QUERY NODE
+                                                    │
+                                 Rewrite question using LLM
+                                                    │
+                                                    ▼
+                                    rewrite_count += 1
+                                                    │
+                                                    ▼
+                                           Retrieve Again
+                                                    │
+                                                    │
+                              Maximum Rewrite Count = 2
+                                                    │
+                                       if exceeded → END
+
+──────────────────────────────────────────────────────────────────────────────
+
+                                  GENERATE NODE
+                                              │
+                                              ▼
+                Merge Retrieved Context into One Prompt
+                                              │
+                Merge Conversation History into Prompt
+                                              │
+                Original / Rewritten Question
+                                              │
+                                              ▼
+                            RAG Prompt Template
+                                              │
+                                              ▼
+                                   Chat Model
+                                              │
+                                              ▼
+                                 Final AI Answer
+                                              │
+                                              ▼
+                          Source Citation Generation
+                                              │
+                                              ▼
+                     Confidence Score Calculation
+                 (Based on Retrieval Similarity Scores)
+
+──────────────────────────────────────────────────────────────────────────────
+
+                             HALLUCINATION CHECK NODE
+                                              │
+                                              ▼
+            LLM compares Generated Answer with Retrieved Context
+                                              │
+                  Is answer grounded in retrieved documents?
+                                              │
+                   Returns only YES / NO
+                                              │
+                                              ▼
+
+                     ┌─────────────────────────────────────────┐
+                     │ hallucination_ok == "yes" ?             │
+                     └─────────────────────────────────────────┘
+                           │                         │
+                         YES                        NO
+                           │                         │
+                           ▼                         ▼
+                        RETURN                Generate Again
+                                                   │
+                                      generation_count += 1
+                                                   │
+                                                   ▼
+                                        Maximum = 2 Attempts
+                                                   │
+                                        if exceeded → RETURN
+
+──────────────────────────────────────────────────────────────────────────────
+
+                                    FINAL RESPONSE
+                                              │
+                                              ▼
+                                        {
+                                        Answer,
+                                        Confidence Score,
+                                        Source Citations,
+                                        Conversation ID
+                                        }
+                                              │
+                                              ▼
+                               Save Assistant Message
+                                              │
+                                              ▼
+                                   Return to Frontend
+
+
+
+
+```
 ```
 
 ---
@@ -450,7 +579,6 @@ Frontend
 
 GitHub: https://github.com/kumarlalit79
 
-LinkedIn: *(Add Profile)*
 
 ---
 
